@@ -1,0 +1,4 @@
+rubybin: /usr/bin/ruby
+log_path: /var/log/mysql/mysql.log
+log_size: 200
+port: 8081

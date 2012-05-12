@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<% # presentation logic
+
+def get_indent(id, min_indent)
+  if id.nil?
+    0
+  else
+    id - min_indent + 1
+  end
+end
+
+def head_datetime(datetime)
+  datetime = if datetime
+    datetime + "<br />"
+  else
+    ""
+  end
+end
+
+_colors = [
+"#e55", # f00
+"#d6b", # f0d
+"#b6f", # d0f
+"#79f", # 00f
+"#4cb", # 0df
+"#3b3", # 0d0
+"#ac0", # ff0
+"#e84", # f80
+]
+COLORS = [0, 4, 1, 5, 2, 6, 3, 7, 4, 0, 5, 1, 6, 2, 7, 3].map{|i|
+  _colors[i]
+}
+
+def color(indent)
+  color_idx = (indent) % COLORS.size
+  COLORS[color_idx]
+end
+
+def crud?(log)
+  log.command == "Query" and
+  /^(insert|select|update|delete)/i =~ log.content
+end
+
+def transaction?(log)
+      /^SET autocommit=/i =~ log.content or
+      /^start transaction/i =~ log.content
+end
+
+def rollback?(log)
+  /^(rollback)$/ =~ log.content
+end
+
+def commit?(log)
+  /^(commit)$/ =~ log.content
+end
+
+def content_classes(log)
+  classes = "content"
+  if crud?(log)
+    classes << " crud"
+  elsif commit?(log)
+    classes << " commit"
+  elsif rollback?(log)
+    classes << " rollback"
+  elsif transaction?(log)
+    classes << " transaction"
+  end
+  classes
+end
+
+def content_pre_classes(log)
+  classes = ""
+  if crud?(log)
+    classes << "prettyprint"
+  end
+  classes
+end
+
+def escape(raw_text)
+  return "" if raw_text.nil?
+
+  raw_text.
+  gsub("&", "&amp;").
+  gsub("<", "&lt;").
+  gsub(">", "&gt;").
+  gsub('"', "&quot;")
+end
+%>
+
+<html lang="ja">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>MySQL Log Viewer</title>
+<link rel="stylesheet" type="text/css" href="prettify.css" media="screen" />
+
+<style>
+* {
+  margin: 0; padding: 0;
+  font-size: 11px;
+}
+body {
+  margin: 2ex 1%;
+  background: #eee;
+}
+
+table { border-collapse: collapse; }
+th { text-align: left; font-weight: normal;
+  font-family: monospace;
+}
+th { padding: 0.5ex 1ex; }
+
+.log {
+  margin: 2px;
+  padding: 0;
+  background: #f4f4f4;
+  background: #eee;
+  color: #666;
+  border: solid #dcdcdc;
+  border-width: 1px;
+  width: 100%;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+}
+.log .head {
+  width: 10ex;
+  min-width: 10ex;
+  border: solid;
+  border-width: 0 0 0 2px !important;
+}
+.log .content {
+  padding: 0.5ex 2ex;
+  border: dashed 1px #aaa;
+  border-width: 0 0 0 1px;
+  border-radius: 0px;
+}
+
+.log .crud {
+  background: #fff !important;
+}
+
+//////////////////////////
+
+.transaction {
+  background: #fff8e8 !important;
+}
+.rollback {
+  background: #fdd !important;
+}
+.commit {
+  background: #dfd !important;
+}
+
+pre.prettyprint{ border: none !important; }
+
+</style>
+
+<script type="text/javascript" src="prettify.js"></script>
+
+<script type="text/javascript">
+window.addEventListener(
+"load", function(){
+    var tables = document.getElementsByTagName("table");
+    var lastL = tables[tables.length - 1].offsetLeft;
+    window.scroll(lastL - 100, document.body.scrollHeight);
+  }, false
+);
+</script>
+
+</head>
+
+<body onload="prettyPrint()">
+
+<% logs.each do |log| %>
+  <% indent = get_indent(log.id, min_indent) %>
+  <table class="log indent_<%= indent %>" style="margin-left: <%= indent * 2 %>em;">
+    <tbody>
+      <tr>
+        <th class="head" style="border-color: <%= color(indent) %>;"
+        ><%= head_datetime(log.datetime) %><%= log.id %> <%= log.command %>
+        </th>
+        <td class="<%= content_classes(log) %>">
+          <pre class="<%= content_pre_classes(log) %>"><%= escape(log.content) %></pre>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+<% end %>
+
+parsed in <%= sec_to_parse %> sec.
+
+</body>
+</html>

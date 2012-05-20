@@ -11,18 +11,25 @@ def abs_path(file)
   File.join(app_home, file)
 end
 
-def do_GET
+def do_GET(cgi)
   conf = YAML.load_file(abs_path("conf.yaml"))
   t0 = Time.now
-  logs = MysqlLogUtil.parse(conf["log_path"], conf["log_size"])
+
+  log_path = if cgi["log_path"].empty?
+               conf["log_path"]
+             else
+               cgi["log_path"]
+             end
+  logs = MysqlLogUtil.parse(log_path, conf["log_size"])
+
   sec_to_parse = Time.now - t0
 
   binding
 end
 
-def main
+def main(cgi)
   begin
-    _binding = do_GET
+    _binding = do_GET(cgi)
     template = File.read(abs_path("mysqllog.erb"))
     ERB.new(template).result(_binding)
   rescue => e
@@ -32,4 +39,4 @@ def main
 end
 
 cgi = CGI.new('html3')
-cgi.out { main }
+cgi.out { main(cgi) }

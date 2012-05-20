@@ -51,13 +51,13 @@ def color(indent)
 end
 
 def crud?(log)
-  log.command == "Query" and
+  /(Query|Prepare|Execute)/ =~ log.command and
   /^(insert|select|update|delete)/i =~ log.content
 end
 
 def transaction?(log)
-      /^SET autocommit=/i =~ log.content or
-      /^start transaction/i =~ log.content
+  /set autocommit=/i =~ log.content or
+  /^start transaction/i =~ log.content
 end
 
 def rollback?(log)

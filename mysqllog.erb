@@ -2,11 +2,24 @@
 
 <% # presentation logic
 
-def get_indent(id, min_indent)
+def make_indent_map(logs)
+  ids = logs.map do |log|
+    log.id
+  end
+  map = {}
+  ids.sort.uniq.each_with_index do |id, idx|
+    map[id] = idx
+  end
+  map
+end
+
+$indent_map = make_indent_map(logs)
+
+def get_indent(id)
   if id.nil?
     0
   else
-    id - min_indent + 1
+    $indent_map[id]
   end
 end
 
@@ -171,7 +184,7 @@ window.addEventListener(
 <body onload="prettyPrint()">
 
 <% logs.each do |log| %>
-  <% indent = get_indent(log.id, min_indent) %>
+  <% indent = get_indent(log.id) %>
   <table class="log indent_<%= indent %>" style="margin-left: <%= indent * 2 %>em;">
     <tbody>
       <tr>

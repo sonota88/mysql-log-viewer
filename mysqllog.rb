@@ -11,22 +11,11 @@ def abs_path(file)
   File.join(app_home, file)
 end
 
-def min_indent(logs)
-  min = nil
-  logs.each{|log|
-    next if log.id.nil?
-    min ||= log.id
-    min = log.id if log.id < min
-  }
-  min
-end
-
 def do_GET
   conf = YAML.load_file(abs_path("conf.yaml"))
   t0 = Time.now
   logs = MysqlLogUtil.parse(conf["log_path"], conf["log_size"])
   sec_to_parse = Time.now - t0
-  min_indent = min_indent(logs)
 
   binding
 end

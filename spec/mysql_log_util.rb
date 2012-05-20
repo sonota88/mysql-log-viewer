@@ -40,6 +40,24 @@ EOB
       end
     end
 
+    describe "normal 4 logs (including Prepare, Execute)" do
+      before do
+
+        log_src = <<EOB
+		  217 Query	set autocommit=0
+		  217 Prepare	insert into items (id, name) values (?, ?)
+		  217 Execute	insert into items (id, name) values (1, 'foo')
+		  217 Query	select name from table1 where id in (1, 2)
+EOB
+
+        @rough_logs = MysqlLogUtil.parse_rough(log_src)
+      end
+
+      it "should be parsed to 4 raw logs" do
+        @rough_logs.size.should == 4
+      end
+    end
+
     # 改行を含むクエリがある3件の場合
     describe "3 logs including query with line break" do
       before do

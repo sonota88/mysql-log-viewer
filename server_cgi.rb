@@ -12,7 +12,7 @@ def mount_by_ext(server, ext)
 end
 
 def print_err(e)
-  STDERR e.class, e.message, e.backtrace
+  STDERR.puts e.class, e.message, e.backtrace
 end
 
 

@@ -2,7 +2,7 @@
 
 module MysqlLogUtil
   DATETIME_RE = /\d+ +\d\d?:\d\d:\d\d/
-  COMMANDS_RE = /Connect|Query|Prepare|Execute|Quit/
+  COMMANDS_RE = /Connect|Query|Prepare|Execute|Quit|Close/
     
   class Log
     attr_accessor :id, :command, :content, :datetime

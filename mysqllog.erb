@@ -175,13 +175,16 @@ window.addEventListener(
     var tables = document.getElementsByTagName("table");
     var lastL = tables[tables.length - 1].offsetLeft;
     window.scroll(lastL - 100, document.body.scrollHeight);
+    if(window.prettyPrint){
+      window.prettyPrint();
+    }
   }, false
 );
 </script>
 
 </head>
 
-<body onload="prettyPrint()">
+<body>
 
 <% logs.each do |log| %>
   <% indent = get_indent(log.id) %>

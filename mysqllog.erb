@@ -85,7 +85,7 @@ end
 def content_pre_classes(log)
   classes = ""
   if crud?(log)
-    classes << "prettyprint"
+    classes << "prettyprint lang-sql"
   end
   classes
 end
@@ -168,6 +168,7 @@ pre.prettyprint{ border: none; }
 </style>
 
 <script type="text/javascript" src="prettify.js"></script>
+<script type="text/javascript" src="lang-sql.js"></script>
 
 <script type="text/javascript">
 window.addEventListener(

@@ -89,6 +89,21 @@ EOB
         @rough_logs.size.should == 0
       end
     end
+
+    describe "Quit and next line" do
+      before do
+        log_src = <<-EOB
+120531 22:58:33	   22 Quit	
+here is next log line
+        EOB
+
+        @rough_logs = MysqlLogUtil.parse_rough(log_src)
+      end
+
+      it "should be parsed to 2 raw logs" do
+        @rough_logs.size.should == 2
+      end
+    end
   end
 
   describe "parse_fine_each" do

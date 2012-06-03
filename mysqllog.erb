@@ -4,7 +4,7 @@
 
 def make_indent_map(logs)
   ids = logs.map do |log|
-    log.id
+    log.id || -1
   end
   map = {}
   ids.sort.uniq.each_with_index do |id, idx|

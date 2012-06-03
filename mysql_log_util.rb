@@ -35,6 +35,13 @@ module MysqlLogUtil
         logs = self.add_log(logs, buf, limit)
         # next
         buf = [line]
+
+        if /^(#{DATETIME_RE}|\t)\t\s*(\d+?) Quit\t\n/m =~ line
+          # flush
+          logs = self.add_log(logs, buf, limit)
+          # next
+          buf = []
+        end
       else
         buf << line
       end
